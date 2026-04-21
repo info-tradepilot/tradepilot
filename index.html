@@ -426,8 +426,6 @@ function nav(id,el){
   if(typeof renderAll==='function')renderAll();
   if(id==='settings'&&typeof applyCompanyProfile==='function')applyCompanyProfile();
 }
-const today=()=>new Date().toISOString().split('T')[0];
-const isElectron=()=>typeof window.tpAPI!=='undefined';
 
 // ── TOAST ──────────────────────────────────────────────────────────────────────
 function toast(m,type=''){
