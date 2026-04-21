@@ -411,8 +411,21 @@ tr:hover td{background:#fafaf9}
 <div class="toast" id="toast"></div>
 
 <script>
-const jsPDF=(window.jspdf&&window.jspdf.jsPDF)?window.jspdf.jsPDF:function(){return{setFillColor:()=>{},rect:()=>{},setTextColor:()=>{},setFontSize:()=>{},setFont:()=>{},text:()=>{},roundedRect:()=>{},line:()=>{},setDrawColor:()=>{},setLineWidth:()=>{},addImage:()=>{},output:()=>'data:application/pdf;base64,',save:(f)=>{alert('PDF library not loaded. Please check your internet connection.');}};};
+const jsPDF=(window.jspdf&&window.jspdf.jsPDF)?window.jspdf.jsPDF:function(){return{setFillColor:()=>{},rect:()=>{},setTextColor:()=>{},setFontSize:()=>{},setFont:()=>{},text:()=>{},roundedRect:()=>{},line:()=>{},setDrawColor:()=>{},setLineWidth:()=>{},addImage:()=>{},output:()=>'data:application/pdf;base64,',save:(f)=>{alert('PDF library not loaded.');}};};
 const fmt=n=>'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const today=()=>new Date().toISOString().split('T')[0];
+const isElectron=()=>typeof window.tpAPI!=='undefined';
+
+// ── NAV — defined first so sidebar clicks always work ─────────────────────────
+function nav(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(el)el.classList.add('active');
+  if(id==='projects'){document.getElementById('plv').style.display='';document.getElementById('pdv').style.display='none';}
+  if(typeof renderAll==='function')renderAll();
+  if(id==='settings'&&typeof applyCompanyProfile==='function')applyCompanyProfile();
+}
 const today=()=>new Date().toISOString().split('T')[0];
 const isElectron=()=>typeof window.tpAPI!=='undefined';
 
@@ -512,14 +525,6 @@ document.addEventListener('DOMContentLoaded',async()=>{
   }
 });
 
-function nav(id,el){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(el)el.classList.add('active');
-  if(id==='projects'){document.getElementById('plv').style.display='';document.getElementById('pdv').style.display='none';}
-  renderAll();
-}
 
 function renderAll(){renderDash();renderProjList();renderInvList();renderBidList();renderExpList();renderInvtList();}
 
