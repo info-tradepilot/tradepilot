@@ -28,7 +28,7 @@ function createWindow() {
     height: 820,
     minWidth: 900,
     minHeight: 600,
-    title: "TradePilot",
+    title: 'TradePilot',
     icon: path.join(__dirname, 'assets', 'icon.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -39,13 +39,12 @@ function createWindow() {
     backgroundColor: '#f8f8f6'
   });
 
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  // Always load index.html explicitly
+  const indexPath = path.join(__dirname, 'index.html');
+  mainWindow.loadFile(indexPath);
   mainWindow.setMenuBarVisibility(false);
 
-  // Fix focus on load
   mainWindow.webContents.on('did-finish-load', refocus);
-
-  // Fix focus lost when resizing, maximizing, fullscreen toggling
   mainWindow.on('enter-full-screen', refocus);
   mainWindow.on('leave-full-screen', refocus);
   mainWindow.on('maximize', refocus);
