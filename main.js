@@ -34,15 +34,22 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      spellcheck: false
+      spellcheck: false,
+      devTools: true
     },
     backgroundColor: '#f8f8f6'
   });
 
-  // Always load index.html explicitly
   const indexPath = path.join(__dirname, 'index.html');
   mainWindow.loadFile(indexPath);
   mainWindow.setMenuBarVisibility(false);
+
+  // Open devtools with F12
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.key === 'F12') {
+      mainWindow.webContents.toggleDevTools();
+    }
+  });
 
   mainWindow.webContents.on('did-finish-load', refocus);
   mainWindow.on('enter-full-screen', refocus);
