@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TradePilot</title>
 <script src="jspdf.min.js"></script>
+<script>
+// Safety wrapper - if jsPDF fails to load, create a dummy so app still works
+if(typeof window.jspdf === 'undefined'){
+  window.jspdf = { jsPDF: function(){ return {
+    setFillColor:()=>{}, rect:()=>{}, setTextColor:()=>{}, setFontSize:()=>{},
+    setFont:()=>{}, text:()=>{}, roundedRect:()=>{}, line:()=>{},
+    setDrawColor:()=>{}, setLineWidth:()=>{}, addImage:()=>{},
+    output:()=>'data:application/pdf;base64,',save:()=>{}
+  };}};
+  console.warn('jsPDF failed to load - PDF export disabled');
+}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
