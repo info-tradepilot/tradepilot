@@ -39,7 +39,7 @@ function createWindow() {
     backgroundColor: '#f8f8f6'
   });
 
-  mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
   mainWindow.setMenuBarVisibility(false);
 
   // Fix focus on load
