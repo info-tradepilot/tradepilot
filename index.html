@@ -436,8 +436,26 @@ function toast(m,type=''){
   setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-function cm(id){document.getElementById(id).classList.remove('open')}
-document.querySelectorAll('.ovl').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open')}));
+function cm(id){document.getElementById(id).classList.remove('open');refocusInputs();}
+document.querySelectorAll('.ovl').forEach(el=>el.addEventListener('click',e=>{if(e.target===el){el.classList.remove('open');refocusInputs();}}));
+
+// Re-enable inputs after any DOM change (delete, modal close, etc)
+function refocusInputs(){
+  setTimeout(()=>{
+    document.querySelectorAll('.ovl').forEach(el=>{
+      if(!el.classList.contains('open')){
+        el.style.pointerEvents='none';
+      }
+    });
+    document.querySelectorAll('.ovl.open').forEach(el=>{
+      el.style.pointerEvents='all';
+    });
+    // Force Electron to refocus the window
+    window.focus();
+    document.body.click();
+    document.body.focus();
+  },50);
+}
 
 // ── STATE ──────────────────────────────────────────────────────────────────────
 const S={
@@ -780,7 +798,7 @@ function saveProj(){
 function delProj(id){
   if(!confirm('Delete project and all linked units?'))return;
   S.projects=S.projects.filter(p=>p.id!==id);S.units=S.units.filter(u=>u.pid!==id);
-  renderAll();schedSave();
+  renderAll();schedSave();refocusInputs();
 }
 
 // ── UNITS ──────────────────────────────────────────────────────────────────────
@@ -884,7 +902,7 @@ function editExp(id){
   (e.lines||[]).forEach(l=>{const lid=Date.now()+Math.random();const tr=document.createElement('tr');tr.id='exl-'+lid;tr.innerHTML=`<td><input type="number" value="${l.qty}" style="width:100%" oninput="syncExpTotal()"></td><td><input type="text" value="${l.desc}" style="width:100%"></td><td><input type="number" value="${l.cost}" step="0.01" style="width:100%" oninput="syncExpTotal()"></td><td style="font-size:13px;padding:4px 7px;color:var(--text2)" id="elt-${lid}">${fmt(l.total)}</td><td><button onclick="document.getElementById('exl-${lid}').remove();syncExpTotal()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:16px">×</button></td>`;document.getElementById('ex-lines').appendChild(tr);});
   document.getElementById('expm').classList.add('open');
 }
-function delExp(id){if(!confirm('Delete expense?'))return;S.expenses=S.expenses.filter(e=>e.id!==id);renderAll();if(S.curProjId)renderProjDetail();schedSave();}
+function delExp(id){if(!confirm('Delete expense?'))return;S.expenses=S.expenses.filter(e=>e.id!==id);renderAll();if(S.curProjId)renderProjDetail();schedSave();refocusInputs();}
 
 // ── INVOICE / BID FORMS ────────────────────────────────────────────────────────
 function populateProjDropdowns(){
@@ -1006,7 +1024,7 @@ function renderInvtList(filter=''){
 }
 function filterInv(v){renderInvtList(v.toLowerCase());}
 function chgStatus(type,id,val){const list=type==='invoice'?S.invoices:S.bids;const doc=list.find(d=>d.id===id);if(doc){doc.status=val;renderAll();if(S.curProjId)renderProjDetail();schedSave();}}
-function delDoc(type,id){if(!confirm('Delete?'))return;if(type==='invoice')S.invoices=S.invoices.filter(i=>i.id!==id);else S.bids=S.bids.filter(b=>b.id!==id);renderAll();if(S.curProjId)renderProjDetail();schedSave();}
+function delDoc(type,id){if(!confirm('Delete?'))return;if(type==='invoice')S.invoices=S.invoices.filter(i=>i.id!==id);else S.bids=S.bids.filter(b=>b.id!==id);renderAll();if(S.curProjId)renderProjDetail();schedSave();refocusInputs();}
 function editDoc(type,id){
   const list=type==='invoice'?S.invoices:S.bids;const doc=list.find(d=>d.id===id);if(!doc)return;
   if(type==='invoice'){openInvForm();populateProjDropdowns();document.getElementById('iv-proj').value=doc.projectId||'';fillDocForm('iv',doc);document.getElementById('invm-ttl').textContent='Edit Invoice';}
@@ -1028,7 +1046,7 @@ function exportPDF(type,id){const list=type==='invoice'?S.invoices:S.bids;const 
 function openInvtForm(){['pt-num','pt-desc'].forEach(f=>document.getElementById(f).value='');document.getElementById('pt-cat').value='Filters';document.getElementById('pt-qty').value=0;document.getElementById('pt-min').value=5;document.getElementById('pt-cost').value=0;document.getElementById('pt-eid').value='';document.getElementById('invtm').classList.add('open');}
 function editPart(id){const p=S.inventory.find(i=>i.id===id);if(!p)return;document.getElementById('pt-eid').value=id;document.getElementById('pt-num').value=p.pn;document.getElementById('pt-desc').value=p.desc;document.getElementById('pt-cat').value=p.cat;document.getElementById('pt-qty').value=p.qty;document.getElementById('pt-min').value=p.min;document.getElementById('pt-cost').value=p.cost;document.getElementById('invtm').classList.add('open');}
 function savePart(){const eid=document.getElementById('pt-eid').value;const p={pn:document.getElementById('pt-num').value,desc:document.getElementById('pt-desc').value,cat:document.getElementById('pt-cat').value,qty:parseInt(document.getElementById('pt-qty').value)||0,min:parseInt(document.getElementById('pt-min').value)||0,cost:parseFloat(document.getElementById('pt-cost').value)||0};if(eid){const idx=S.inventory.findIndex(i=>i.id===parseInt(eid));p.id=parseInt(eid);S.inventory[idx]=p;}else{p.id=++S.ptCtr;S.inventory.push(p);}cm('invtm');renderAll();schedSave();toast('Part saved','ok');}
-function delPart(id){if(!confirm('Remove?'))return;S.inventory=S.inventory.filter(i=>i.id!==id);renderAll();schedSave();}
+function delPart(id){if(!confirm('Remove?'))return;S.inventory=S.inventory.filter(i=>i.id!==id);renderAll();schedSave();refocusInputs();}
 
 // ── PDF GENERATION ─────────────────────────────────────────────────────────────
 async function generateAndSavePDF(doc,type){
