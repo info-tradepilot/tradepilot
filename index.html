@@ -411,7 +411,7 @@ tr:hover td{background:#fafaf9}
 <div class="toast" id="toast"></div>
 
 <script>
-const {jsPDF}=window.jspdf;
+const jsPDF=(window.jspdf&&window.jspdf.jsPDF)?window.jspdf.jsPDF:function(){return{setFillColor:()=>{},rect:()=>{},setTextColor:()=>{},setFontSize:()=>{},setFont:()=>{},text:()=>{},roundedRect:()=>{},line:()=>{},setDrawColor:()=>{},setLineWidth:()=>{},addImage:()=>{},output:()=>'data:application/pdf;base64,',save:(f)=>{alert('PDF library not loaded. Please check your internet connection.');}};};
 const fmt=n=>'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const today=()=>new Date().toISOString().split('T')[0];
 const isElectron=()=>typeof window.tpAPI!=='undefined';
